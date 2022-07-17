@@ -11,6 +11,7 @@ close all;
 
 %% INPUT DATA
 
+type = "iterative"; % direct or iterative
 F = 920; % [N]
 Young = 75000e6; % [Pa]
 Area = 120e-6; % [m^2]
@@ -106,7 +107,7 @@ Fext = computeF(n_i,n_dof,Fdata);
 [vL,vR,uR] = applyCond(n_i,n_dof,fixNod);
 
 % System resolution
-[u,R] = solveSys(vL,vR,uR,KG,Fext);
+[u,R] = Solver.solve(vL,vR,uR,KG,Fext,type);
 
 % Compute strain and stresses
 [eps,sig] = computeStrainStressBar(n_d,n_el,u,Td,x,Tn,mat,Tmat);

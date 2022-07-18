@@ -128,3 +128,13 @@ plotStrainStress(n_d,sig,x,Tn,{'Stress';'(Pa)'});
 
 % Plot stress in defomed mesh
 plotBarStressDef(x,Tn,u,sig,1)
+
+%% UNIT TESTING
+close all
+testCase = matlab.unittest.TestCase.forInteractiveUse;
+unitTests (R, F, KG, u, Fext, x, testCase);
+
+
+
+
+

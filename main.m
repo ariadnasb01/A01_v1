@@ -11,7 +11,7 @@ close all;
 
 %% INPUT DATA
 
-type = "iterative"; % direct or iterative
+type = "iterative"; % solver used: direct or iterative
 F = 920; % [N]
 Young = 75000e6; % [Pa]
 Area = 120e-6; % [m^2]
@@ -105,6 +105,7 @@ Fext = computeF(n_i,n_dof,Fdata);
 
 % Apply conditions 
 [vL,vR,uR] = applyCond(n_i,n_dof,fixNod);
+save calculatedBeforeSolve.mat;
 
 % System resolution
 [u,R] = Solver.solve(vL,vR,uR,KG,Fext,type);
@@ -130,9 +131,17 @@ plotStrainStress(n_d,sig,x,Tn,{'Stress';'(Pa)'});
 plotBarStressDef(x,Tn,u,sig,1)
 
 %% UNIT TESTING
+
+% Save calculated solution
+save calculatedSolution.mat;
+
+
 close all
-testCase = matlab.unittest.TestCase.forInteractiveUse;
-unitTests (R, F, KG, u, Fext, x, testCase);
+
+results = run(Test);
+disp(results)
+
+
 
 
 

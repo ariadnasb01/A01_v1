@@ -135,7 +135,6 @@ plotBarStressDef(x,Tn,u,sig,1)
 % Save calculated solution
 save calculatedSolution.mat;
 
-
 close all
 
 results = run(Test);

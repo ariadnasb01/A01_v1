@@ -17,3 +17,6 @@ Inertia = 1400e-12; % [m^4]
 %dimension = dimension.setDimension(data.x, data.Tn);
 
 S = calculate(F, Young, Area, thermalCoeff, Inertia, type);
+
+
+

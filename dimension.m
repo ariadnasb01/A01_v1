@@ -1,4 +1,4 @@
-classdef dimension
+classdef dimension < handle 
     properties
         n_d       % Number of dimensions
         n_i       % Number of DOFs for each node

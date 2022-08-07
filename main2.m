@@ -13,6 +13,7 @@ Area = 120e-6; % [m^2]
 thermalCoeff = 23e-6; % [K^(-1)]
 Inertia = 1400e-12; % [m^4]
 
-data = data.setData(F, Young, Area, thermalCoeff, Inertia);
-dimension = dimension.setDimension(data.x, data.Tn);
+%data = data.setData(F, Young, Area, thermalCoeff, Inertia);
+%dimension = dimension.setDimension(data.x, data.Tn);
 
+S = calculate(F, Young, Area, thermalCoeff, Inertia, type);

@@ -1,4 +1,4 @@
-classdef data
+classdef data < handle
     properties
         x
         Tn

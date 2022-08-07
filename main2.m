@@ -13,10 +13,25 @@ Area = 120e-6; % [m^2]
 thermalCoeff = 23e-6; % [K^(-1)]
 Inertia = 1400e-12; % [m^4]
 
-%data = data.setData(F, Young, Area, thermalCoeff, Inertia);
-%dimension = dimension.setDimension(data.x, data.Tn);
 
-S = calculate(F, Young, Area, thermalCoeff, Inertia, type);
+Solution = calculate(F, Young, Area, thermalCoeff, Inertia, type);
+
+save ('calcSol.mat', 'Solution');
+
+import matlab.unittest.parameters.Parameter
+import matlab.unittest.TestSuite
+
+param = Parameter.fromData('KElementalMatrix', {Solution.KElementalMatrix}, ...
+    'KGlobalMatrix', {Solution.KGlobalMatrix}, ...
+    'ForcesExt', {Solution.ForcesExt}, ...
+    'FreeDOF', {Solution.FreeDOF}, ...
+    'FixDOF', {Solution.FixDOF}, ...
+    'FixDispl', {Solution.FixDispl});
+
+suite = TestSuite.fromClass(?Tests,'ExternalParameters',param);
+
+results = suite.run;
+disp(results)
 
 
 

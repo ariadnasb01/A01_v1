@@ -1,9 +1,5 @@
 classdef calculate < handle
     properties (Access = public)
-        datas
-        dimensions
-        type
-        nodalConnect
         KElementalMatrix
         KGlobalMatrix
         ForcesExt
@@ -11,13 +7,16 @@ classdef calculate < handle
         FixDOF
         FixDispl
         displacements
-        reactions
-        strain
-        stress
     end
 
     properties (Access = private)
-        %datas
+        datas
+        dimensions
+        type
+        nodalConnect
+        reactions
+        strain
+        stress
     end
 
     methods (Access = public)

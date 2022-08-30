@@ -1,8 +1,8 @@
 classdef assemblyKG < handle
 
-    properties
+    properties (Access = public)
         KGlobalMatrix
-    end
+    end    
 
     methods (Access = public)
 

@@ -5,12 +5,7 @@ classdef testClass < handle
     end
 
     properties (Access = private)
-        calcKElementalMatrix
-        calcKGlobalMatrix
-        calcForcesExt
-        calcFreeDOF
-        calcFixDOF
-        calcFixDispl
+        solution
 
         exactKElementalMatrix
         exactKGlobalMatrix
@@ -37,6 +32,8 @@ classdef testClass < handle
             obj.calcFreeDOF = Solution.FreeDOF;
             obj.calcFixDOF = Solution.FixDOF;
             obj.calcFixDispl = Solution.FixDispl;
+
+            obj.solution = cParams.solution;
         end
 
 

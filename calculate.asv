@@ -1,10 +1,9 @@
 classdef StructuralComputer < handle
-   
     properties (Access = public)
-        kElementalMatrix
-        kGlobalMatrix
-        forcesExt
-        freeDOF
+        KElementalMatrix
+        KGlobalMatrix
+        ForcesExt
+        FreeDOF
         FixDOF
         FixDispl
         displacements
@@ -28,10 +27,10 @@ classdef StructuralComputer < handle
 
         function compute(obj)
             obj.computeConnectivities();
-            obj.computeKelBar();
-            obj.assemblyStiffnesMatrix();
-            obj.computeForces();
-            obj.applyBoundaryConditions();
+            obj.computeKelBar;
+            obj.assemblyKG;
+            obj.computeF;
+            obj.applyCond;
             obj.solve;
             obj.computeStrainStressBar;
         end
@@ -52,12 +51,12 @@ classdef StructuralComputer < handle
 
 
         function computeConnectivities(obj)
-            nElem  = obj.dimensions.n_el;
-            nNodes = obj.dimensions.n_nod;
-            nDim   = obj.dimensions.n_i;
-            Tn     = obj.datas.Tn;
+            n_el = obj.dimensions.n_el;
+            n_nod = obj.dimensions.n_nod;
+            n_i   = obj.dimensions.n_i;
+            Tn    = obj.datas.Tn;
             
-            s.dimensions = obj.dimensions;
+            s.dimensions = obj.di
             c = ConnectivitiesComputer(s);
             T = c.compute();
             obj.nodalConnect = T;
@@ -73,7 +72,7 @@ classdef StructuralComputer < handle
             Tmat = obj.datas.Tmat;
 
             Kel = computeKelBar(n_d,n_el,x,Tn,mat,Tmat);
-            obj.kElementalMatrix = Kel.KElementalMatrix;
+            obj.KElementalMatrix = Kel.KElementalMatrix;
 
         end
 
@@ -83,10 +82,10 @@ classdef StructuralComputer < handle
             n_el_dof = obj.dimensions.n_el_dof;
             n_dof = obj.dimensions.n_dof;
             Td = obj.nodalConnect;
-            Kel = obj.kElementalMatrix;
+            Kel = obj.KElementalMatrix;
 
             KG = assemblyKG(n_el,n_el_dof,n_dof,Td,Kel);
-            obj.kGlobalMatrix = KG.KGlobalMatrix;
+            obj.KGlobalMatrix = KG.KGlobalMatrix;
 
         end
 
@@ -96,7 +95,7 @@ classdef StructuralComputer < handle
             Fdata = obj.datas.Fdata;
 
             Fext = computeF.calculate(n_dof, Fdata);
-            obj.forcesExt = Fext; %.ForcesExt;
+            obj.ForcesExt = Fext; %.ForcesExt;
 
         end
 
@@ -106,19 +105,19 @@ classdef StructuralComputer < handle
 
             DisplAndDOFs = applyCond(fixNod);
 
-            obj.freeDOF = DisplAndDOFs.vL;
-            obj.fixDOF = DisplAndDOFs.vR;
-            obj.fixDispl = DisplAndDOFs.uR;
+            obj.FreeDOF = DisplAndDOFs.vL;
+            obj.FixDOF = DisplAndDOFs.vR;
+            obj.FixDispl = DisplAndDOFs.uR;
 
         end
 
 
         function solve(obj)
-            vL = obj.freeDOF;
+            vL = obj.FreeDOF;
             vR = obj.FixDOF;
             uR = obj.FixDispl;
-            KG = obj.kGlobalMatrix;
-            Fext = obj.forcesExt;
+            KG = obj.KGlobalMatrix;
+            Fext = obj.ForcesExt;
             solverType = obj.type;
 
             [u,R] = Solver.solve(vL,vR,uR,KG,Fext,solverType);

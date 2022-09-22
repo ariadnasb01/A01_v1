@@ -2,71 +2,85 @@ classdef testClass < handle
 
     properties (Access = public)
         results
+        table1
+        table2
     end
 
     properties (Access = private)
-        calcKElementalMatrix
-        calcKGlobalMatrix
-        calcForcesExt
-        calcFreeDOF
-        calcFixDOF
-        calcFixDispl
-
-        exactKElementalMatrix
-        exactKGlobalMatrix
-        exactDisplacements
+        expectedResults
+        calculatedResults
     end
 
 
     methods (Access = public)
 
-        function obj = testClass(Solution)
-            obj.getCalcSolution(Solution);
-            obj.getExactSolution;
-            obj.runTests;
+        function obj = testClass(cParams)
+            obj.init(cParams);
+        end
+
+        function check(obj)
+            obj.testKElementalMatrix();
+            obj.testKGlobalMatrix();
+            obj.testForces();
+            obj.testIterative();
+            obj.testDirect();
+            obj.showResults();
         end
 
     end
 
     methods (Access = private)
 
-        function getCalcSolution(obj,Solution)
-            obj.calcKElementalMatrix = Solution.KElementalMatrix;
-            obj.calcKGlobalMatrix = Solution.KGlobalMatrix;
-            obj.calcForcesExt = Solution.ForcesExt;
-            obj.calcFreeDOF = Solution.FreeDOF;
-            obj.calcFixDOF = Solution.FixDOF;
-            obj.calcFixDispl = Solution.FixDispl;
+        function init(obj,cParams)
+            expRes = load('exactSolution.mat');
+            obj.expectedResults = expRes;
+            obj.calculatedResults = cParams;
+        end
+        
+        function testKElementalMatrix(obj)
+            s.expKElementalMatrix = obj.expectedResults.Kel;
+            s.calcKElementalMatrix = obj.calculatedResults.kElementalMatrix;
+            c = KElementalMatrixTester(s); 
+            c.test();
+            obj.results.kElementalMatrix = c.results;
         end
 
-
-        function getExactSolution(obj)
-            expected = load('exactSolution.mat');
-
-            obj.exactKElementalMatrix = expected.Kel;
-            obj.exactKGlobalMatrix = expected.KG;
-            obj.exactDisplacements = expected.u;
+        function testKGlobalMatrix(obj)
+            s.expKGlobalMatrix = obj.expectedResults.KG;
+            s.calcKGlobalMatrix = obj.calculatedResults.kGlobalMatrix;
+            c = KGlobalMatrixTester(s); 
+            c.test();
+            obj.results.kGlobalMatrix = c.results;
         end
 
+        function testForces(obj)
+            s.expForces = obj.expectedResults.Fext;
+            s.calcForces = obj.calculatedResults.forcesExt;
+            c = ForcesTester(s); 
+            c.test();
+            obj.results.forcesExt = c.results;
+        end
 
-        function runTests(obj)
-            import matlab.unittest.parameters.Parameter
-            import matlab.unittest.TestSuite
-            
-            param = Parameter.fromData('calcKElementalMatrix', {obj.calcKElementalMatrix}, ...
-                'calcKGlobalMatrix', {obj.calcKGlobalMatrix}, ...
-                'calcForcesExt', {obj.calcForcesExt}, ...
-                'calcFreeDOF', {obj.calcFreeDOF}, ...
-                'calcFixDOF', {obj.calcFixDOF}, ...
-                'calcFixDispl', {obj.calcFixDispl}, ...
-                'exactKElementalMatrix', {obj.exactKElementalMatrix}, ...
-                'exactKGlobalMatrix', {obj.exactKGlobalMatrix}, ...
-                'exactDisplacements', {obj.exactDisplacements});
-            
-            suite = TestSuite.fromClass(?Tests,'ExternalParameters',param);
-            
-            obj.results = suite.run;
-            disp(obj.results)
+        function testIterative(obj)
+            s.expDisplacement = obj.expectedResults.u;
+            s.calculatedValues = obj.calculatedResults;            
+            c = IterativeTester(s); 
+            c.test();
+            obj.results.iterativeTest = c.results;
+        end
+        
+        function testDirect(obj)
+            s.expDisplacement = obj.expectedResults.u;
+            s.calculatedValues = obj.calculatedResults;            
+            c = DirectTester(s); 
+            c.test();
+            obj.results.directTest = c.results;
+        end
+
+        function showResults(obj)
+            res = obj.results;
+            c = ResultsDisplayer(res);
+            c.show();
         end
 
     end

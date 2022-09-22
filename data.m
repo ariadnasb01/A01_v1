@@ -1,5 +1,6 @@
-classdef data < handle
-    properties
+classdef Data < handle
+
+    properties (Access = public)
         x
         Tn
         Fdata
@@ -9,7 +10,14 @@ classdef data < handle
     end
 
     methods (Access = public, Static)
-        function obj = setData (F, Young, Area, thermalCoeff, Inertia)
+
+        function obj = setData (cParams)
+            F = cParams.F;
+            Young = cParams.Young;
+            Area = cParams.Area;
+            thermalCoeff = cParams.thermalCoeff;
+            Inertia = cParams.Inertia;
+
             obj.x = [0 0
                     0.5 0.2
                     1 0.4
@@ -45,13 +53,11 @@ classdef data < handle
                     5 1 0
                     5 2 0];
 
-            obj.mat = [Young, Area, thermalCoeff, Inertia;
-                    ];
+            obj.mat = [Young, Area, thermalCoeff, Inertia];
 
             obj.Tmat = [1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1];
-
         end
+        
     end
-
 
 end

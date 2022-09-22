@@ -2,7 +2,13 @@ classdef Iterative < Solver
 
     methods (Access = public, Static)
 
-        function [u,R] = solve(vL,vR,uR,KG,Fext)
+        function [u,R] = solve(parameters)
+            vL = parameters.vL;
+            vR = parameters.vR;
+            uR = parameters.uR;
+            KG = parameters.KG;
+            Fext = parameters.Fext;
+            
             KLL = KG(vL, vL);
             KLR = KG(vL, vR);
             KRL = KG(vR, vL);
@@ -19,6 +25,8 @@ classdef Iterative < Solver
             R(vL,1) = 0;
             R(vR,1) = RR;
         end
+
     end
+    
 end
 

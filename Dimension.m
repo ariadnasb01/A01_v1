@@ -12,16 +12,19 @@ classdef Dimension < handle
 
     methods (Access = public, Static)
 
-        function obj = setDimension (x, Tn)
-            obj.nDim = size(x,2);
-            obj.nDofNode = obj.nDim;
-            obj.nNode = size(x,1);
-            obj.nDofTotal = obj.nDofNode*obj.nNode;
-            obj.nElem = size(Tn,1);  
-            obj.nNodeElem = size(Tn,2); 
-            obj.nDofElem = obj.nDofNode*obj.nNodeElem; 
+        function obj = setDimension (datas)
+            x  = datas.nodalCoordinates;
+            Tn = datas.nodalConnectivities;
+
+            obj.nDim        = size(x,2);
+            obj.nDofNode    = obj.nDim;
+            obj.nNode       = size(x,1);
+            obj.nDofTotal   = obj.nDofNode*obj.nNode;
+            obj.nElem       = size(Tn,1);  
+            obj.nNodeElem   = size(Tn,2); 
+            obj.nDofElem    = obj.nDofNode*obj.nNodeElem; 
         end
 
     end
-
+    
 end

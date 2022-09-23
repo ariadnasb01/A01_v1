@@ -30,7 +30,7 @@ classdef StructuralComputer < handle
             obj.computeConnectivities();
             obj.assemblyStiffnesMatrix();
             obj.computeForces();
-            obj.solve();
+            obj.computeDisplacements();
             obj.computeStrainStressBar;
         end
 
@@ -39,68 +39,63 @@ classdef StructuralComputer < handle
     methods (Access = private)
         
         function init(obj,cParams)
-            obj.datas = Data.setData(cParams);
-            obj.dimensions = Dimension.setDimension(obj.datas.x, obj.datas.Tn);
-            obj.type = cParams.type;
+            obj.datas      = Data.setData(cParams);
+            obj.dimensions = Dimension.setDimension(obj.datas);
+            obj.type       = cParams.type;
         end
 
         function computeConnectivities(obj)
-            s.dimensions = obj.dimensions;
-            s.Tn = obj.datas.Tn;
-            s.fixNod = obj.datas.fixNod;
+            s.dimensions          = obj.dimensions;
+            s.nodalConnectivities = obj.datas.nodalConnectivities;
+            s.fixedNodes          = obj.datas.fixedNodes;
             c = ConnectivitiesComputer(s);
             c.compute();
-            obj.nodalConnect = c.Td;
-            obj.freeDOF = c.vL;
-            obj.fixDOF = c.vR;
-            obj.fixDispl = c.uR;
+            obj.nodalConnect = c.DOFsConnectivities;
+            obj.freeDOF      = c.freeDOF;
+            obj.fixDOF       = c.fixDOF;
+            obj.fixDispl     = c.fixDispl;
         end
 
         function assemblyStiffnesMatrix(obj)
-            s.dimensions = obj.dimensions;
-            s.datas = obj.datas;
+            s.dimensions   = obj.dimensions;
+            s.datas        = obj.datas;
             s.nodalConnect = obj.nodalConnect;
             k = StiffnesMatrixAssembler(s);
             k.compute();
             obj.kElementalMatrix = k.kElementalMatrix;
-            obj.kGlobalMatrix = k.kGlobalMatrix;
+            obj.kGlobalMatrix    = k.kGlobalMatrix;
         end
 
         function computeForces(obj)
-            s.nDofTotal = obj.dimensions.nDofTotal;
-            s.Fdata = obj.datas.Fdata;
+            s.nDofTotal  = obj.dimensions.nDofTotal;
+            s.forcesData = obj.datas.forcesData;
             f = ForcesComputer(s);
             Fext = f.compute();
             obj.forcesExt = Fext;
         end
 
-        function solve(obj)
-            s.vL = obj.freeDOF;
-            s.vR = obj.fixDOF;
-            s.uR = obj.fixDispl;
-            s.KG = obj.kGlobalMatrix;
-            s.Fext = obj.forcesExt;
+        function computeDisplacements(obj)
+            s.vL         = obj.freeDOF;
+            s.vR         = obj.fixDOF;
+            s.uR         = obj.fixDispl;
+            s.KG         = obj.kGlobalMatrix;
+            s.Fext       = obj.forcesExt;
             s.solverType = obj.type;
-            sol = Solver(s);
-            sol.solve();
-            obj.displacements = sol.u;
-            obj.reactions = sol.R;
+            sol = DisplacementReactionComputer(s);
+            sol.compute();
+            obj.displacements = sol.displacement;
+            obj.reactions     = sol.reaction;
         end
 
-
         function computeStrainStressBar(obj)
-            s.dimensions = obj.dimensions;
-            s.datas = obj.datas;
-            s.nodalConnect = obj.nodalConnect;
+            s.dimensions    = obj.dimensions;
+            s.datas         = obj.datas;
+            s.nodalConnect  = obj.nodalConnect;
             s.displacements = obj.displacements;
-
             StrainStress = StrainStressBarComputer(s);
             StrainStress.compute();
-
             obj.strain = StrainStress.strain;
             obj.stress = StrainStress.stress;
         end
-
     end
-
 end

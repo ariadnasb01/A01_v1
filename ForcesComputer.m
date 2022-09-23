@@ -6,7 +6,7 @@ classdef ForcesComputer < handle
 
     properties (Access = private)
         nDofTotal
-        Fdata
+        forcesData
     end
 
     methods (Access = public)
@@ -24,31 +24,26 @@ classdef ForcesComputer < handle
     methods (Access = private)
 
         function init(obj,cParams)
-            obj.nDofTotal = cParams.nDofTotal;
-            obj.Fdata = cParams.Fdata;
+            obj.nDofTotal  = cParams.nDofTotal;
+            obj.forcesData = cParams.forcesData;
         end
-
 
         function Fext = computeF(obj)
-            nDofTotal = obj.nDofTotal;
-            Fdata = obj.Fdata;
+            nDofT = obj.nDofTotal;
+            F     = obj.forcesData;
 
-            Fext = zeros(nDofTotal, 1);
-
-            for i = 1:length(Fdata)
-                m = Fdata(i,1);
-                n = Fdata(i,2);
-
+            Fext = zeros(nDofT, 1);
+            for iDOF = 1:length(F)
+                m = F(iDOF,1);
+                n = F(iDOF,2);
                 if mod(n,2)==0
-                    Fext(m*2,1) = Fdata(i,3);
+                    Fext(m*2,1) = F(iDOF,3);
                 else
-                    Fext(m*2-1,1) = Fdata(i,3);
+                    Fext(m*2-1,1) = F(iDOF,3);
                 end
-
             end
-
         end
 
-   end
-
+    end
+    
 end

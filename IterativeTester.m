@@ -5,11 +5,11 @@ classdef IterativeTester < handle
     end
     
     properties (Access = private)
-        calcFreeDOF
-        calcFixDOF
-        calcFixDispl
-        calcKGlobalMatrix
-        calcForcesExt
+        freeDOF
+        fixDOF
+        fixDispl
+        kGlobalMatrix
+        forcesExt
         calcDisplacement
         solverType
         expDisplacement
@@ -31,35 +31,31 @@ classdef IterativeTester < handle
     methods (Access = private)
 
         function init(obj,cParams)
-            obj.expDisplacement = cParams.expDisplacement;
-            obj.calcFreeDOF = cParams.calculatedValues.freeDOF;
-            obj.calcFixDOF = cParams.calculatedValues.fixDOF;
-            obj.calcFixDispl = cParams.calculatedValues.fixDispl;
-            obj.calcKGlobalMatrix = cParams.calculatedValues.kGlobalMatrix;
-            obj.calcForcesExt = cParams.calculatedValues.forcesExt;
+            obj.expDisplacement = cParams.displacements;
+            obj.freeDOF = cParams.freeDOF;
+            obj.fixDOF = cParams.fixDOF;
+            obj.fixDispl = cParams.fixDispl;
+            obj.kGlobalMatrix = cParams.kGlobalMatrix;
+            obj.forcesExt = cParams.forcesExt;
         end
 
         function getDisplacement(obj)
-            s.vL = obj.calcFreeDOF;
-            s.vR = obj.calcFixDOF;
-            s.uR = obj.calcFixDispl;
-            s.KG = obj.calcKGlobalMatrix;
-            s.Fext = obj.calcForcesExt;
+            s.vL = obj.freeDOF;
+            s.vR = obj.fixDOF;
+            s.uR = obj.fixDispl;
+            s.KG = obj.kGlobalMatrix;
+            s.Fext = obj.forcesExt;
             s.solverType = "iterative";
-            sol = Solver(s);
-            sol.solve();
-            obj.calcDisplacement = sol.u;
+            sol = DisplacementReactionComputer(s);
+            sol.compute();
+            obj.calcDisplacement = sol.displacement;
         end
 
         function testDisplacement (obj)
             A = obj.expDisplacement;
             B = obj.calcDisplacement;
-
-            if (abs(A-B) < 1e4*eps(min(abs(A),abs(B))))
-                obj.results = 1;
-            else
-                obj.results = 0;
-            end
+            c = matrixTester(A, B); 
+            obj.results = c.results;
         end
 
     end

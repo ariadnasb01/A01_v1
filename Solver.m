@@ -1,56 +1,43 @@
 classdef Solver < handle
 
-    properties (Access = public)
-        u
-        R
-    end
-
     properties (Access = private)
-        parameters
         solverType
+        LHS
+        RHS
     end
 
     methods (Access = public)
-
+        
         function obj = Solver(cParams)
             obj.init(cParams);
         end
-        
-        function solve(obj)
-            obj.compute();
+
+        function uL = solve(obj)
+            uL = obj.compute();
         end
 
     end
 
     methods (Access = private)
 
-        function init(obj,cParams)
-            obj.parameters = cParams;
-            obj.solverType = cParams.solverType;
+        function init(obj, cParams)
+            obj.solverType = cParams.type;
+            obj.LHS = cParams.LHS;
+            obj.RHS = cParams.RHS;
         end
 
-        function compute(obj)
+        function uL = compute(obj)
+            A = obj.LHS;
+            B = obj.RHS;
             type = obj.solverType;
-            params = obj.parameters;
-
             switch type 
                 case "direct"
-                [u,R] = Direct.solve(params);
-
+                uL = Direct.solve(A, B);
                 case "iterative"
-                [u,R] = Iterative.solve(params);
+                uL = Iterative.solve(A, B);
             end
-
-            obj.u = u;
-            obj.R = R;
-
         end
 
     end
-    
+
 end
-
-
-
-
-

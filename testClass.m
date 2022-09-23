@@ -2,15 +2,12 @@ classdef testClass < handle
 
     properties (Access = public)
         results
-        table1
-        table2
     end
 
     properties (Access = private)
         expectedResults
         calculatedResults
     end
-
 
     methods (Access = public)
 
@@ -32,49 +29,55 @@ classdef testClass < handle
     methods (Access = private)
 
         function init(obj,cParams)
-            expRes = load('exactSolution.mat');
-            obj.expectedResults = expRes;
-            obj.calculatedResults = cParams;
+            obj.expectedResults = cParams;
         end
         
         function testKElementalMatrix(obj)
-            s.expKElementalMatrix = obj.expectedResults.Kel;
-            s.calcKElementalMatrix = obj.calculatedResults.kElementalMatrix;
-            c = KElementalMatrixTester(s); 
-            c.test();
+            s.expKElementalMatrix = obj.expectedResults.kElementalMatrix;
+            s.dimensions          = obj.expectedResults.dimensions;
+            s.datas               = obj.expectedResults.datas;
+            s.nodalConnect        = obj.expectedResults.nodalConnect;
+            k = StiffnesMatrixAssembler(s);
+            k.compute();
+            obj.calculatedResults.kGlobalMatrix = k.kGlobalMatrix;
+            A = k.kElementalMatrix;
+            B = obj.expectedResults.kElementalMatrix;
+            c = matrixTester(A, B); 
             obj.results.kElementalMatrix = c.results;
         end
 
         function testKGlobalMatrix(obj)
-            s.expKGlobalMatrix = obj.expectedResults.KG;
-            s.calcKGlobalMatrix = obj.calculatedResults.kGlobalMatrix;
-            c = KGlobalMatrixTester(s); 
-            c.test();
+            A = obj.calculatedResults.kGlobalMatrix;
+            B = obj.expectedResults.kGlobalMatrix;
+            c = matrixTester(A, B); 
             obj.results.kGlobalMatrix = c.results;
         end
 
         function testForces(obj)
-            s.expForces = obj.expectedResults.Fext;
-            s.calcForces = obj.calculatedResults.forcesExt;
-            c = ForcesTester(s); 
+            s.nDofTotal  = obj.expectedResults.dimensions.nDofTotal;
+            s.forcesData = obj.expectedResults.datas.forcesData;
+            f = ForcesComputer(s);
+            a.calcForces = f.compute();
+            a.expForces = obj.expectedResults.forcesExt;
+            c = ForcesTester(a); 
             c.test();
             obj.results.forcesExt = c.results;
         end
 
         function testIterative(obj)
-            s.expDisplacement = obj.expectedResults.u;
-            s.calculatedValues = obj.calculatedResults;            
-            c = IterativeTester(s); 
+            expected = obj.expectedResults;
+            c = IterativeTester(expected); 
             c.test();
             obj.results.iterativeTest = c.results;
         end
         
         function testDirect(obj)
-            s.expDisplacement = obj.expectedResults.u;
-            s.calculatedValues = obj.calculatedResults;            
-            c = DirectTester(s); 
+            expected = obj.expectedResults;           
+            c = DirectTester(expected); 
             c.test();
             obj.results.directTest = c.results;
+            A = c.calcDisplacement;
+            B = c.expDisplacement;
         end
 
         function showResults(obj)

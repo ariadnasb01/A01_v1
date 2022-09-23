@@ -35,11 +35,10 @@ classdef ResultsDisplayer < handle
             end
             for i = 1:length(names)
                 if (res(i)==1)
-                    disp("Test passed:")
-                    disp(names(i))
+                    disp([names{i}, ': Test passed'])
                 else
-                    disp("Test not passed:")
-                    disp(names(i))
+                    disp([names{i}, ': Test not passed'])
+
                 end
             end
         end

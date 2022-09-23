@@ -1,16 +1,16 @@
 classdef ConnectivitiesComputer < handle
 
     properties (Access = public)
-        Td
-        vL
-        vR
-        uR
+        DOFsConnectivities
+        freeDOF
+        fixDOF
+        fixDispl
     end
 
     properties (Access = private)
         dimensions
-        Tn
-        fixNod
+        nodalConnectivities
+        fixedNodes
     end
 
     methods (Access = public)
@@ -29,17 +29,17 @@ classdef ConnectivitiesComputer < handle
     methods (Access = private)
 
         function init(obj,cParams)
-            obj.dimensions = cParams.dimensions;
-            obj.Tn = cParams.Tn;
-            obj.fixNod = cParams.fixNod;
+            obj.dimensions          = cParams.dimensions;
+            obj.nodalConnectivities = cParams.nodalConnectivities;
+            obj.fixedNodes          = cParams.fixedNodes;
         end
 
         function computeConnect(obj)
-            nElem = obj.dimensions.nElem;
-            nNodeElem = obj.dimensions.nNodeElem;
-            nDofNode = obj.dimensions.nDofNode;
-            Tn = obj.Tn;
-            
+            nElem       = obj.dimensions.nElem;
+            nNodeElem   = obj.dimensions.nNodeElem;
+            nDofNode    = obj.dimensions.nDofNode;
+            Tn          = obj.nodalConnectivities;
+
             Td = zeros(nElem, nNodeElem*nDofNode);
             for i = 1:4
                 Td(:,1) = 2*Tn(:,1)-1;
@@ -47,36 +47,30 @@ classdef ConnectivitiesComputer < handle
                 Td(:,2) = 2*Tn(:,1);
                 Td(:,4) = 2*Tn(:,2);
             end
-            obj.Td = Td;
+            obj.DOFsConnectivities = Td;
         end
 
         function applyBoundaryCond(obj)
-            fixNod = obj.fixNod;
-
+            fixNod = obj.fixedNodes;
             vR = zeros(size(fixNod,1),1);
             uR = zeros(size(fixNod,1),1);
             v = linspace(1,16,16);
-
-            for i = 1:size(fixNod,1)
-                a = fixNod(i,1);
-                b = fixNod(i,2);
-
+            for iDOF = 1:size(fixNod,1)
+                a = fixNod(iDOF,1);
+                b = fixNod(iDOF,2);
                 if (mod(b,2)==0)
-                    vR(i,1) = 2*a;
-                    uR(i,1) = fixNod(i,3);
-
+                    vR(iDOF,1) = 2*a;
+                    uR(iDOF,1) = fixNod(iDOF,3);
                 else
-                    vR(i,1) = 2*a-1;
-                    uR(i,1) = fixNod(i,3);
+                    vR(iDOF,1) = 2*a-1;
+                    uR(iDOF,1) = fixNod(iDOF,3);
                 end
-
             end
-
             vL = setdiff(v,vR);
-
-            obj.vL = vL;
-            obj.vR = vR;
-            obj.uR = uR;
+            
+            obj.freeDOF = vL;
+            obj.fixDOF = vR;
+            obj.fixDispl = uR;
         end
         
     end

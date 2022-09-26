@@ -72,12 +72,10 @@ classdef testClass < handle
         end
         
         function testDirect(obj)
-            expected = obj.expectedResults;           
+            expected = obj.expectedResults;  
             c = DirectTester(expected); 
             c.test();
             obj.results.directTest = c.results;
-            A = c.calcDisplacement;
-            B = c.expDisplacement;
         end
 
         function showResults(obj)

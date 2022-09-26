@@ -31,7 +31,7 @@ classdef StructuralComputer < handle
             obj.assemblyStiffnesMatrix();
             obj.computeForces();
             obj.computeDisplacements();
-            obj.computeStrainStressBar;
+            obj.computeStrainStressBar();
         end
 
     end
